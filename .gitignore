@@ -333,3 +333,4 @@ ASALocalRun/
 migrations/versions
 alembic.ini
 sample.sqlite
+submissions.csv

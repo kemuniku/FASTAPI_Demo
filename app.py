@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends
 import uvicorn
 
-from schemas import PostTodo
-from models import TodoModel
+from schemas import PostSubmission
+from models import SubmissionModel
 from settings import SessionLocal
 
 from sqlalchemy.orm import Session
@@ -29,16 +29,25 @@ def get_todo(
         db: Session = Depends(get_db)
     ):
     # query関数でmodels.pyで定義したモデルを指定し、.all()関数ですべてのレコードを取得
-    return db.query(TodoModel).all()
+    return db.query(SubmissionModel).all()
 
-# ToDoを作成するAPI
-@app.post("/todo")
+# submissionを追加するAPI
+@app.post("/submission")
 def post_todo(
-        todo: PostTodo, 
+        submission: PostSubmission, 
         db: Session = Depends(get_db)
     ):
     # 受け取ったtitleからモデルを作成
-    db_model = TodoModel(title = todo.title)
+    db_model = SubmissionModel(id=submission.id,
+                               epoch_second=submission.epoch_second,
+                               problem_id=submission.problem_id,
+                               contest_id=submission.contest_id,
+                               user_id=submission.user_id,
+                               language = submission.language,
+                               point = submission.point,
+                               length = submission.length,
+                               result = submission.result,
+                               execution_time = submission.execution_time)
     # データベースに登録（インサート）
     db.add(db_model)
     # 変更内容を確定
@@ -52,11 +61,18 @@ def delete_todo(
         id: int,
         db: Session = Depends(get_db)
     ):
-    delete_todo = db.query(TodoModel).filter(TodoModel.id==id).one()
+    delete_todo = db.query(SubmissionModel).filter(SubmissionModel.id==id).one()
     db.delete(delete_todo)
     db.commit()
 
     return {"message": "success"}
+
+@app.delete("/submission/alldelete")
+def delete_all(
+    db: Session = Depends(get_db)
+    ):
+    db.query(SubmissionModel).delete()
+    db.commit()
 
 
 if __name__ == "__main__":
