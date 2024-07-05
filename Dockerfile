@@ -17,3 +17,5 @@ RUN pip install --upgrade setuptools
 RUN python -m pip install jupyterlab
 RUN pip install "fastapi[all]"
 RUN pip install flask
+RUN pip install alembic SQLAlchemy
+
